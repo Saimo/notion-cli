@@ -124,7 +124,7 @@ export async function example4_customRetry() {
       async () => {
         console.log('Attempting API call...')
         // Simulate an operation that might fail
-        return await notion.client.users.me({})
+        return await notion.getClient().users.me({})
       },
       {
         config: {

@@ -16,7 +16,7 @@ import {
   showRawFlagHint,
   stripMetadata,
 } from '../../helper'
-import { client } from '../../notion'
+import { getClient } from '../../notion'
 import { AutomationFlags, OutputFormatFlags } from '../../base-flags'
 import {
   NotionCLIError,
@@ -267,7 +267,7 @@ export default class DbQuery extends Command {
       if (flags['page-all']) {
         pages = await notion.fetchAllPagesInDS(databaseId, queryParams.filter)
       } else {
-        const res = await client.dataSources.query(queryParams)
+        const res = await getClient().dataSources.query(queryParams)
         pages.push(...res.results)
       }
 

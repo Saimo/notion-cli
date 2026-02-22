@@ -77,17 +77,17 @@ export default class ConfigSetToken extends Command {
       }
 
       // Validate token format
-      if (!token || !token.startsWith('secret_')) {
+      if (!token || (!token.startsWith('secret_') && !token.startsWith('ntn_'))) {
         throw new NotionCLIError(
           NotionCLIErrorCode.TOKEN_INVALID,
-          'Invalid token format - Notion tokens must start with "secret_"',
+          'Invalid token format - Notion tokens must start with "secret_" or "ntn_"',
           [
             {
               description: 'Get your integration token from Notion',
               link: 'https://developers.notion.com/docs/create-a-notion-integration'
             },
             {
-              description: 'Tokens should look like: secret_abc123...',
+              description: 'Tokens should look like: secret_abc123... or ntn_abc123...',
             }
           ],
           {
