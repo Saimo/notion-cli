@@ -26,6 +26,7 @@
     "@oclif/plugin-help": "^6.2.37",
     "dayjs": "^1.11.19",
     "notion-to-md": "^3.1.6",
+    "undici": "^7.20.0",
     "update-notifier": "^7.3.1"
   },
   "devDependencies": {
@@ -56,8 +57,7 @@
     "ts-node": "^10.9.2",
     "tslib": "^2.8.1",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.54.0",
-    "undici": "^7.20.0"
+    "typescript-eslint": "^8.54.0"
   },
   "oclif": {
     "bin": "notion-cli",
