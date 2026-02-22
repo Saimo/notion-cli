@@ -7,7 +7,7 @@ import {
   wrapNotionError
 } from '../errors'
 import { validateNotionToken, maskToken } from '../utils/token-validator'
-import { client, botUser as fetchBotUser } from '../notion'
+import { getClient, botUser as fetchBotUser } from '../notion'
 import { loadCache } from '../utils/workspace-cache'
 import { colors, ASCII_BANNER } from '../utils/terminal-banner'
 
@@ -394,7 +394,7 @@ export default class Init extends Command {
       let cursor: string | undefined = undefined
 
       while (true) {
-        const response = await client.search({
+        const response = await getClient().search({
           filter: {
             value: 'data_source',
             property: 'object',

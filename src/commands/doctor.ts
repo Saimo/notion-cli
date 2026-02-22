@@ -1,5 +1,5 @@
 import { Command, Flags } from '@oclif/core'
-import { client } from '../notion'
+import { getClient } from '../notion'
 import { loadCache, getCachePath } from '../utils/workspace-cache'
 import * as fs from 'fs/promises'
 import * as https from 'https'
@@ -205,7 +205,7 @@ export default class Doctor extends Command {
     }
 
     try {
-      const user = await client.users.me({})
+      const user = await getClient().users.me({})
 
       let botName = 'Unknown Bot'
       let workspaceName: string | undefined

@@ -1,5 +1,5 @@
 import { Command, Flags, ux } from '@oclif/core'
-import { client } from '../notion'
+import { getClient } from '../notion'
 import { fetchWithRetry as enhancedFetchWithRetry } from '../retry'
 import {
   saveCache,
@@ -185,7 +185,7 @@ export default class Sync extends Command {
 
     while (true) {
       const response = await enhancedFetchWithRetry(
-        () => client.search({
+        () => getClient().search({
           filter: {
             value: 'data_source',
             property: 'object',

@@ -45,7 +45,7 @@ function createFetchWithAgent(): typeof fetch {
   }
 }
 
-export const client = new Client({
+export const getClient = () => new Client({
   auth: process.env.NOTION_TOKEN,
   logLevel: process.env.DEBUG ? LogLevel.DEBUG : null,
   // Note: The @notionhq/client library uses its own HTTP client
@@ -148,7 +148,7 @@ export const fetchAllPagesInDS = async (
 
   while (true) {
     const { results, next_cursor } = await enhancedFetchWithRetry(
-      () => client.dataSources.query({
+      () => getClient().dataSources.query({
         data_source_id: databaseId,
         filter: f,
         start_cursor: cursor,
@@ -172,7 +172,7 @@ export const createDb = async (
   dbProps: CreateDatabaseParameters
 ): Promise<CreateDatabaseResponse> => {
   const result = await enhancedFetchWithRetry(
-    () => client.databases.create(dbProps),
+    () => getClient().databases.create(dbProps),
     { context: 'createDb' }
   )
 
@@ -189,7 +189,7 @@ export const updateDb = async (
   dbProps: UpdateDatabaseParameters
 ): Promise<GetDatabaseResponse> => {
   const result = await enhancedFetchWithRetry(
-    () => client.databases.update(dbProps),
+    () => getClient().databases.update(dbProps),
     { context: `updateDb:${dbProps.database_id}` }
   )
 
@@ -207,7 +207,7 @@ export const retrieveDb = async (databaseId: string): Promise<GetDatabaseRespons
   return cachedFetch(
     'database',
     databaseId,
-    () => client.databases.retrieve({ database_id: databaseId })
+    () => getClient().databases.retrieve({ database_id: databaseId })
   )
 }
 
@@ -218,7 +218,7 @@ export const retrieveDataSource = async (dataSourceId: string): Promise<GetDataS
   return cachedFetch(
     'dataSource',
     dataSourceId,
-    () => client.dataSources.retrieve({ data_source_id: dataSourceId })
+    () => getClient().dataSources.retrieve({ data_source_id: dataSourceId })
   )
 }
 
@@ -229,7 +229,7 @@ export const updateDataSource = async (
   dsProps: UpdateDataSourceParameters
 ): Promise<GetDataSourceResponse> => {
   const result = await enhancedFetchWithRetry(
-    () => client.dataSources.update(dsProps),
+    () => getClient().dataSources.update(dsProps),
     { context: `updateDataSource:${dsProps.data_source_id}` }
   )
 
@@ -246,7 +246,7 @@ export const retrievePage = async (pageProp: GetPageParameters) => {
   return cachedFetch(
     'page',
     pageProp.page_id,
-    () => client.pages.retrieve(pageProp)
+    () => getClient().pages.retrieve(pageProp)
   )
 }
 
@@ -255,7 +255,7 @@ export const retrievePage = async (pageProp: GetPageParameters) => {
  */
 export const retrievePageProperty = async (pageId: string, propId: string) => {
   return enhancedFetchWithRetry(
-    () => client.pages.properties.retrieve({
+    () => getClient().pages.properties.retrieve({
       page_id: pageId,
       property_id: propId,
     }),
@@ -268,7 +268,7 @@ export const retrievePageProperty = async (pageId: string, propId: string) => {
  */
 export const createPage = async (pageProps: CreatePageParameters) => {
   const result = await enhancedFetchWithRetry(
-    () => client.pages.create(pageProps),
+    () => getClient().pages.create(pageProps),
     { context: 'createPage' }
   )
 
@@ -285,7 +285,7 @@ export const createPage = async (pageProps: CreatePageParameters) => {
  */
 export const updatePageProps = async (pageParams: UpdatePageParameters) => {
   const result = await enhancedFetchWithRetry(
-    () => client.pages.update(pageParams),
+    () => getClient().pages.update(pageParams),
     { context: `updatePageProps:${pageParams.page_id}` }
   )
 
@@ -302,7 +302,7 @@ export const updatePageProps = async (pageParams: UpdatePageParameters) => {
 export const updatePage = async (pageId: string, blocks: BlockObjectRequest[]) => {
   // Get all blocks
   const blks = await enhancedFetchWithRetry(
-    () => client.blocks.children.list({ block_id: pageId }),
+    () => getClient().blocks.children.list({ block_id: pageId }),
     { context: `updatePage:list:${pageId}` }
   )
 
@@ -310,7 +310,7 @@ export const updatePage = async (pageId: string, blocks: BlockObjectRequest[]) =
   if (blks.results.length > 0) {
     const deleteResults = await batchWithRetry(
       blks.results.map(blk =>
-        () => client.blocks.delete({ block_id: blk.id })
+        () => getClient().blocks.delete({ block_id: blk.id })
       ),
       {
         concurrency: BATCH_CONFIG.deleteConcurrency,
@@ -329,7 +329,7 @@ export const updatePage = async (pageId: string, blocks: BlockObjectRequest[]) =
 
   // Append new blocks
   const res = await enhancedFetchWithRetry(
-    () => client.blocks.children.append({
+    () => getClient().blocks.children.append({
       block_id: pageId,
 
       children: blocks,
@@ -351,7 +351,7 @@ export const retrieveBlock = async (blockId: string) => {
   return cachedFetch(
     'block',
     blockId,
-    () => client.blocks.retrieve({ block_id: blockId })
+    () => getClient().blocks.retrieve({ block_id: blockId })
   )
 }
 
@@ -360,7 +360,7 @@ export const retrieveBlock = async (blockId: string) => {
  */
 export const updateBlock = async (params: UpdateBlockParameters) => {
   const result = await enhancedFetchWithRetry(
-    () => client.blocks.update(params),
+    () => getClient().blocks.update(params),
     { context: `updateBlock:${params.block_id}` }
   )
 
@@ -377,7 +377,7 @@ export const retrieveBlockChildren = async (blockId: string) => {
   return cachedFetch(
     'block',
     `${blockId}:children`,
-    () => client.blocks.children.list({ block_id: blockId })
+    () => getClient().blocks.children.list({ block_id: blockId })
   )
 }
 
@@ -386,7 +386,7 @@ export const retrieveBlockChildren = async (blockId: string) => {
  */
 export const appendBlockChildren = async (params: AppendBlockChildrenParameters) => {
   const result = await enhancedFetchWithRetry(
-    () => client.blocks.children.append(params),
+    () => getClient().blocks.children.append(params),
     { context: `appendBlockChildren:${params.block_id}` }
   )
 
@@ -402,7 +402,7 @@ export const appendBlockChildren = async (params: AppendBlockChildrenParameters)
  */
 export const deleteBlock = async (blockId: string) => {
   const result = await enhancedFetchWithRetry(
-    () => client.blocks.delete({ block_id: blockId }),
+    () => getClient().blocks.delete({ block_id: blockId }),
     { context: `deleteBlock:${blockId}` }
   )
 
@@ -419,7 +419,7 @@ export const retrieveUser = async (userId: string) => {
   return cachedFetch(
     'user',
     userId,
-    () => client.users.retrieve({ user_id: userId })
+    () => getClient().users.retrieve({ user_id: userId })
   )
 }
 
@@ -430,7 +430,7 @@ export const listUser = async () => {
   return cachedFetch(
     'user',
     'list',
-    () => client.users.list({})
+    () => getClient().users.list({})
   )
 }
 
@@ -441,7 +441,7 @@ export const botUser = async () => {
   return cachedFetch(
     'user',
     'me',
-    () => client.users.me({})
+    () => getClient().users.me({})
   )
 }
 
@@ -453,7 +453,7 @@ export const searchDb = async () => {
     'search',
     'databases',
     async () => {
-      return await client.search({
+      return await getClient().search({
         filter: {
           value: 'data_source',
           property: 'object',
@@ -469,7 +469,7 @@ export const searchDb = async () => {
  */
 export const search = async (params: SearchParameters) => {
   return enhancedFetchWithRetry(
-    () => client.search(params),
+    () => getClient().search(params),
     { context: 'search' }
   )
 }

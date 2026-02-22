@@ -146,7 +146,7 @@ export default class PageRetrieve extends Command {
 
       // Handle page content as markdown (uses NotionToMarkdown)
       if (flags.markdown) {
-        const n2m = new NotionToMarkdown({ notionClient: notion.client })
+        const n2m = new NotionToMarkdown({ notionClient: notion.getClient() })
         const mdBlocks = await n2m.pageToMarkdown(pageId)
         const mdString = n2m.toMarkdownString(mdBlocks)
         console.log(mdString.parent)
